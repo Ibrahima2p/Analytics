@@ -106,4 +106,6 @@ df.loc[df['op_id_soft'].isnull() & df["npsp__primary_contact__c"].notnull(), "so
 df.loc[(df["npsp__role_name__c"] == "Donor Advised Fund") & (df['npsp__contact__c'].notnull()), 
            "npsp__primary_contact__c"] = df['npsp__contact__c']
 
-
+# Save the table to the analytics schema
+civis.io.dataframe_to_civis(df, database = db, table = 'analytics.opportunity_replace_primary_contact.py',
+                             existing_table_rows='drop')
