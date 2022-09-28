@@ -150,5 +150,5 @@ contacts_demographics.loc[contacts_demographics["state"] == "CA", "date_of_birth
 contacts_demographics.loc[contacts_demographics["state"] == "CA", "age_bucket"] = 'UNKNOWN'
 
 # Save the to the analytics schema in civis
-civis.io.dataframe_to_civis(contacts_demog_unknown_cal, database = db, table = 'analytics.contacts_demog_unknown_cal',
+civis.io.dataframe_to_civis(contacts_demographics, database = db, table = 'analytics.contacts_demographics',
                              existing_table_rows='drop')
