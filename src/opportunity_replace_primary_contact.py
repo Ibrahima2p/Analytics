@@ -8,8 +8,9 @@ db = "UN High Commissioner for Refugees"
 
 # The query to select the necessary columns
 query = """
-    SELECT o.npsp__primary_contact__c, 
-           s.npsp__contact__c, 
+    SELECT o.contactid,
+           o.npsp__primary_contact__c, 
+           s.npsp__contact__c,          
            s.npsp__opportunity__c as op_id_soft, 
            o.id,
            o.name, 
@@ -17,27 +18,23 @@ query = """
            s.npsp__role_name__c,
            s.npsp__amount__c,
            o.amount,
-           /* 
            o.stagename,
            o.probability,
-           o.expectedrevenue,
-           o.closedate,
+           o.expectedrevenue,   
            o.type,
-           
+           o.isclosed,
            o.iswon,
            o.forecastcategory,
            o.forecastcategoryname,
            o.campaignid,
            o.ownerid,
-           o.creteddate,
            o.createdbyid,
            o.lastmodifieddate,
            o.lastmodifiedbyid,
            o.fiscalquarter,
            o.fiscalyear,
-           o.fiscal,
-           o.contactid,
-           o.openactivity,
+           o.fiscal, 
+           o.hasopenactivity,
            o.hasoverduetask,
            o.npe01__contact_id_for_role__c,
            o.npe01__is_opp_from_individual__c,
@@ -77,19 +74,15 @@ query = """
            o.source_contact_type__c,
            o.source_type__c,
            o.transaction_amount__c, 
-           */
-           o.isclosed,
-           s.createddate
-           
+           o.closedate,
+           o.createddate
+                      
     FROM ds_salesforce.npsp__partial_soft_credit__c as s
         RIGHT JOIN ds_salesforce.opportunity as o
         ON s.npsp__opportunity__c = o.id
-    INNER JOIN ds_salesforce.account AS a
+        INNER JOIN ds_salesforce.account AS a
         ON o.accountid = a.id
-    WHERE o.closedate >= '2022-01-01' --AND s.createddate >= '2022-01-01'
-            --s.npsp__role_name__c = 'Donor Advised Fund'     -- AND 
-            --(a.membership_type__c = 'Major Donor' OR a.membership_type__c = 'Mid-Level')  
-    ORDER BY o.contactid     
+    ORDER BY o.closedate, o.contactid     
 """
 
 
