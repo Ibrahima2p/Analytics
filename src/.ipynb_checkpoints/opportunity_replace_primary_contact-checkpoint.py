@@ -23,7 +23,7 @@ query = """
            o.expectedrevenue,
            o.closedate,
            o.type,
-           
+           o.isclosed,
            o.iswon,
            o.forecastcategory,
            o.forecastcategoryname,
@@ -78,7 +78,6 @@ query = """
            o.source_type__c,
            o.transaction_amount__c, 
            */
-           o.isclosed,
            s.createddate
            
     FROM ds_salesforce.npsp__partial_soft_credit__c as s
@@ -99,19 +98,13 @@ dtype_dict = {'npsp__primary_contact__c':str, 'npsp__contact__c':str, 'npsp__con
 # Read the data from civis
 df = civis.io.read_civis_sql(query, database = db, dtype=dtype_dict, use_pandas=True)
 
-# Create the new column whether or not npsp__primary_contact__c got changed 
-df.loc[df['op_id_soft'].notnull() & df["npsp__primary_contact__c"].isnull() , "changed_to_soft_credit"] = 'yes'
-df.loc[(df['op_id_soft'].isnull() & df["npsp__primary_contact__c"].isnull()) | 
-       (df['op_id_soft'].notnull() & df["npsp__primary_contact__c"].notnull()) |
-        df["npsp__primary_contact__c"].notnull(), "changed_to_soft_credit"] = 'no'
+# Create the new column whether or not a donation is soft credit
+df.loc[df['op_id_soft'].notnull() , "soft_credit"] = 'yes'
+df.loc[df['op_id_soft'].isnull() & df["npsp__primary_contact__c"].notnull(), "soft_credit"] = 'no'
 
 # Replace npsp__primary_contact__c variable with npsp__contact__c for Donor Advised Fund
 df.loc[(df["npsp__role_name__c"] == "Donor Advised Fund") & (df['npsp__contact__c'].notnull()), 
            "npsp__primary_contact__c"] = df['npsp__contact__c']
-
-# Replace contactid variable with npsp__contact__c for Donor Advised Fund
-df.loc[(df["npsp__role_name__c"] == "Donor Advised Fund") & (df['npsp__contact__c'].notnull()), 
-           "contactid"] = df['npsp__contact__c']
 
 # Save the table to the analytics schema
 civis.io.dataframe_to_civis(df, database = db, table = 'analytics.opportunity_replace_primary_contact.py',
