@@ -95,6 +95,9 @@ dtype_dict = {'contactid':str, 'npsp__primary_contact__c':str, 'npsp__contact__c
 # Read the data from civis
 df = civis.io.read_civis_sql(query, database = db, dtype=dtype_dict, use_pandas=True)
 
+# Drop duplicates
+df = df.drop_duplicates()
+
 # Create the new column whether or not npsp__primary_contact__c got changed 
 df.loc[df['op_id_soft'].notnull() & df["npsp__primary_contact__c"].isnull() , "changed_to_soft_credit"] = 'yes'
 df.loc[(df['op_id_soft'].isnull() & df["npsp__primary_contact__c"].isnull()) | 
