@@ -86,8 +86,11 @@ query = """
 """
 
 
-dtype_dict = {'npsp__primary_contact__c':str, 'npsp__contact__c':str, 'npsp__contact_name__c':str, 
-              'id':str, 'npsp__role_name__c':str}
+dtype_dict = {'contactid':str, 'npsp__primary_contact__c':str, 'npsp__contact__c':str, 'npsp__contact_name__c':str,
+              'id':str, 'npsp__role_name__c':str, 'op_id_soft':str, 'npe01__contact_id_for_role__c':str, 
+              'npe03__recurring_donation__c':str, 'npsp__acknowledgment_date__c':str,
+              'npsp__recurring_donation_installment_name__c':str, 'roi_family_id__c':str, 'contactcaseid__c':str, 
+              'recurring_payment_order__c':str, 'gl_code__c':str, 'psp_code__c':str, 'related_donation__c':str}
 
 # Read the data from civis
 df = civis.io.read_civis_sql(query, database = db, dtype=dtype_dict, use_pandas=True)
