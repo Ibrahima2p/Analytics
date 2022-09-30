@@ -116,5 +116,5 @@ df.loc[(df["npsp__role_name__c"] == "Donor Advised Fund") & (df['npsp__contact__
 df = df.drop(['npsp__contact__c', 'npsp__contact_name__c', 'npsp__amount__c', 'op_id_soft'], axis = 1) 
 
 # Save the table to the analytics schema
-civis.io.dataframe_to_civis(df, database = db, table = 'analytics.opportunity_replace_primary_contact.py',
+civis.io.dataframe_to_civis(df, database = db, table = 'analytics.opportunities_dafcontacts',
                              existing_table_rows='drop')
