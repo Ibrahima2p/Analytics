@@ -78,7 +78,7 @@ query = """
                       
     FROM ds_salesforce.opportunity as o
         LEFT JOIN ds_salesforce.npsp__partial_soft_credit__c as s
-        ON s.npsp__opportunity__c = o.id
+        ON o.id = s.npsp__opportunity__c
         
     ORDER BY o.closedate  
 """
@@ -97,12 +97,9 @@ df = civis.io.read_civis_sql(query, database = db, dtype=dtype_dict, use_pandas=
 df = df.drop_duplicates()
 
 # Create the new column whether or not npsp__primary_contact__c got changed 
-df.loc[df["npsp__primary_contact__c"].isnull() & (df["npsp__role_name__c"] == "Donor Advised Fund") & 
-      (df['npsp__contact__c'].notnull()), "changed_to_soft_credit"] = 'yes'
-
-df.loc[(df['op_id_soft'].isnull() & df["npsp__primary_contact__c"].isnull()) | (df['op_id_soft'].notnull() & 
-        df["npsp__primary_contact__c"].notnull()) | df["npsp__primary_contact__c"].notnull() | 
-       (df["npsp__role_name__c"] != "Donor Advised Fund"), "changed_to_soft_credit"] = 'no'
+df["changed_to_soft_credit"] = np.where((df["npsp__primary_contact__c"].isnull()) & 
+                                        (df["npsp__role_name__c"] == "Donor Advised Fund") & 
+                                        (df['npsp__contact__c'].notnull()), 'yes', 'no')
 
 # Replace npsp__primary_contact__c variable with npsp__contact__c for Donor Advised Fund
 df.loc[(df["npsp__role_name__c"] == "Donor Advised Fund") & (df['npsp__contact__c'].notnull()), 
