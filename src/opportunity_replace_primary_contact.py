@@ -8,11 +8,11 @@ db = "UN High Commissioner for Refugees"
 
 # The query to select the necessary columns
 query = """
-    SELECT o.contactid,
+    SELECT o.id,
+           o.contactid,
            o.npsp__primary_contact__c, 
-           s.npsp__contact__c,          
-           s.npsp__opportunity__c as op_id_soft, 
-           o.id,
+           s.npsp__contact__c,
+           s.npsp__opportunity__c as op_id_soft,
            o.name, 
            s.npsp__contact_name__c, 
            s.npsp__role_name__c,
@@ -45,7 +45,6 @@ query = """
            o.npsp__acknowledgment_date__c,
            o.npsp__acknowledgment_status__c,
            o.npsp__recurring_donation_installment_name__c,
-           o.npsp__primary_contact__c,
            o.sfmc_primary_contact__c,
            o.umb_receipt_sent__c,
            o.caseopportunityid__c,
@@ -77,12 +76,11 @@ query = """
            o.closedate,
            o.createddate
                       
-    FROM ds_salesforce.npsp__partial_soft_credit__c as s
-        RIGHT JOIN ds_salesforce.opportunity as o
+    FROM ds_salesforce.opportunity as o
+        LEFT JOIN ds_salesforce.npsp__partial_soft_credit__c as s
         ON s.npsp__opportunity__c = o.id
-        INNER JOIN ds_salesforce.account AS a
-        ON o.accountid = a.id
-    ORDER BY o.closedate, o.contactid     
+        
+    ORDER BY o.closedate  
 """
 
 
@@ -100,6 +98,7 @@ df = df.drop_duplicates()
 
 # Create the new column whether or not npsp__primary_contact__c got changed 
 df.loc[df['op_id_soft'].notnull() & df["npsp__primary_contact__c"].isnull() , "changed_to_soft_credit"] = 'yes'
+
 df.loc[(df['op_id_soft'].isnull() & df["npsp__primary_contact__c"].isnull()) | 
        (df['op_id_soft'].notnull() & df["npsp__primary_contact__c"].notnull()) |
         df["npsp__primary_contact__c"].notnull(), "changed_to_soft_credit"] = 'no'
